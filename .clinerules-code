@@ -12,7 +12,7 @@ You are an expert in TypeScript, Node.js, React, Vite, TanStack Query, TanStack 
 2. **Authentication & Authorization**
    - Supabase for AUTH ONLY - no database access
    - Server-side auth checks using middleware
-   - Protected routes under _authed layout
+   - Protected routes under _authed/app layout
    - Clean separation of public/protected components
 
 3. **Tech Stack**
@@ -42,14 +42,20 @@ You are an expert in TypeScript, Node.js, React, Vite, TanStack Query, TanStack 
 ```
 src/
 ├── routes/
-│   ├── _authed/        # Protected routes
-│   ├── __root.tsx      # Root layout
-│   ├── _authed.tsx     # Auth layout
-│   └── index.tsx       # Public home
+│   ├── _authed/           # Protected routes container
+│   │   ├── -server.ts     # Auth server functions
+│   │   └── app/          # Protected application routes
+│   │       ├── alerts/
+│   │       ├── billing/
+│   │       ├── dashboard/
+│   │       └── settings/
+│   ├── __root.tsx         # Root layout
+│   ├── _authed.tsx        # Auth layout
+│   └── index.tsx          # Public home
 ├── components/
-│   ├── ui/            # Shared UI components
-│   └── [feature]/     # Feature-specific components
-└── hooks/             # Custom hooks
+│   ├── ui/               # Shared UI components
+│   └── [feature]/        # Feature-specific components
+└── hooks/                # Custom hooks
 ```
 
 ## Documentation Requirements
@@ -72,27 +78,26 @@ src/
 3. Follow existing patterns for consistency
 4. Document significant changes
 5. Ask for clarification when needed
+6. Clean up after significant changes:
+   - Update documentation to reflect new patterns
+   - Update .clinerules-code for high-level architectural changes
+   - Review and update README.md for project-wide changes
+   - Never document granular implementation details in high-level docs
 
-If asked my name, I am samaritan.
+## Project Context & Understanding
 
-# Cursor Development Rules & AI Collaboration Guide
+1. **Documentation First:**
+   * **Always** check for and thoroughly review relevant project documentation *before* starting any task. This includes:
+       * Product Requirements Documents (PRDs)
+       * `docs\tanstack-core-concepts.md` (System architecture, component relationships)
+       * `docs\middleware.md` (For when dealing with server functions, supabase and createServerFn tasks)
+       * `docs\auth-system.md` (How the auth system works, when dealing with server function or API related tasks.)
+   * If documentation is missing, unclear, or conflicts with the request, **ask for clarification**. And then modify the documentation files.
 
-## 📚 Project Context & Understanding
+2. **RULE MODIFICATION**
+   Then update this file here `.clinerules-code` as it contains your instructions that you can modify yourself to improve. Ask me always before modifying the rules.
 
-1.  **Documentation First:**
-    *   **Always** check for and thoroughly review relevant project documentation *before* starting any task. This includes:
-        *   Product Requirements Documents (PRDs)
-        *   `docs\tanstack-core-concepts.md` (System architecture, component relationships)
-        *   `docs\middleware.md` (For when dealing with server functions, supabase and createServerFn tasks)
-        *   `docs\auth-system.md` (How the auth system works, when dealing with server function or API related tasks.)
-    *   If documentation is missing, unclear, or conflicts with the request, **ask for clarification**. And then modify the documentation files.
-
-2. **RULE MODIFICATION **
-    Then update this file here `.clinerules-code` as it contains your instructions that you can modify yourself to improve. Ask me always before modifying the rules.
-
-3. Dir structure (main files)
-
-src/routes/_authed/
-src/routes/__root.tsx
-src/routes/_authed.tsx
-src/routes/index.tsx
+3. **Main Route Structure**
+   - Public Routes: Accessible without authentication
+   - Protected Routes: Under _authed/app/* requiring authentication
+   - Auth Routes: Login/Register flows

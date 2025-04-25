@@ -4,10 +4,12 @@ import { Footer } from '~/components/Footer'
 import { checkAuthFn } from './_authed/-server'
 
 export const Route = createFileRoute('/_authed')({
-  beforeLoad: async ({ location }) => {
+  staleTime: Infinity, // Cache for the entire session
+  loader: async ({ location }) => {
+    console.log('Running checkAuthFn in loader...');
     const response = await checkAuthFn()
 
-    console.log('checkAuthFn response', response)
+    console.log('checkAuthFn response:', response)
 
     if (!response?.user || response.error) {
       throw redirect({

@@ -20,6 +20,7 @@
     "@tanstack/react-router-devtools": "^1.117.0",
     "@tanstack/react-start": "^1.117.0",
     "class-variance-authority": "^0.7.1",
+    "framer-motion": "^12.9.1",
     "lucide-react": "^0.503.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

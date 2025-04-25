@@ -1,4 +1,5 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter, redirect } from '@tanstack/react-router'
+import { checkAuthFn } from '~/routes/_authed/-server'
 import { useMutation } from '~/hooks/useMutation'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -11,6 +12,15 @@ export const Route = createFileRoute('/login')({
     return {
       redirect: search.redirect as string | undefined,
     }
+  },
+  loader: async () => {
+    const response = await checkAuthFn()
+    if (response?.user && !response.error) {
+      throw redirect({
+        to: '/app',
+      })
+    }
+    return null
   },
   component: LoginPage,
 })

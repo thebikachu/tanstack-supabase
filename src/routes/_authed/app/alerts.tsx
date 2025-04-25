@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card } from '~/components/ui/card'
 
-export const Route = createFileRoute('/_authed/alerts')({
+export const Route = createFileRoute('/_authed/app/alerts')({
   component: AlertsPage,
 })
 

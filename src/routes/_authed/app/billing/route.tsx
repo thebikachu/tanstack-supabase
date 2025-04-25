@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { Card } from '~/components/ui/card'
 
-export const Route = createFileRoute('/_authed/billing')({
+export const Route = createFileRoute('/_authed/app/billing')({
   component: BillingLayout,
 })
 

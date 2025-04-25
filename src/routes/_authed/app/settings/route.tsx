@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute, Link } from '@tanstack/react-router'
 import { Card } from '~/components/ui/card'
 
-export const Route = createFileRoute('/_authed/settings')({
+export const Route = createFileRoute('/_authed/app/settings')({
   component: SettingsLayout,
 })
 
@@ -19,21 +19,21 @@ function SettingsLayout() {
         <Card className="p-4 md:w-64 shrink-0">
           <nav className="space-y-2">
             <Link
-              to="/settings/profile"
+              to="/app/settings/profile"
               className="block px-3 py-2 text-sm rounded-md hover:bg-accent"
               activeProps={{ className: 'bg-accent' }}
             >
               Profile
             </Link>
             <Link
-              to="/settings/security"
+              to="/app/settings/security"
               className="block px-3 py-2 text-sm rounded-md hover:bg-accent"
               activeProps={{ className: 'bg-accent' }}
             >
               Security
             </Link>
             <Link
-              to="/settings/notifications"
+              to="/app/settings/notifications"
               className="block px-3 py-2 text-sm rounded-md hover:bg-accent"
               activeProps={{ className: 'bg-accent' }}
             >

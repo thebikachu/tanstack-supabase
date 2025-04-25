@@ -25,19 +25,20 @@ import { Route as PostsIndexImport } from './routes/posts.index'
 import { Route as UsersUserIdImport } from './routes/users.$userId'
 import { Route as PostsPostIdImport } from './routes/posts.$postId'
 import { Route as PathlessLayoutNestedLayoutImport } from './routes/_pathlessLayout/_nested-layout'
-import { Route as AuthedAlertsImport } from './routes/_authed/alerts'
-import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings/route'
-import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard/route'
-import { Route as AuthedBillingRouteImport } from './routes/_authed/billing/route'
-import { Route as AuthedSettingsIndexImport } from './routes/_authed/settings/index'
-import { Route as AuthedDashboardIndexImport } from './routes/_authed/dashboard/index'
-import { Route as AuthedBillingIndexImport } from './routes/_authed/billing/index'
+import { Route as AuthedAppIndexImport } from './routes/_authed/app/index'
 import { Route as PostsPostIdDeepImport } from './routes/posts_.$postId.deep'
 import { Route as PathlessLayoutNestedLayoutRouteBImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteAImport } from './routes/_pathlessLayout/_nested-layout/route-a'
-import { Route as AuthedSettingsSecurityImport } from './routes/_authed/settings/security'
-import { Route as AuthedSettingsProfileImport } from './routes/_authed/settings/profile'
-import { Route as AuthedSettingsNotificationsImport } from './routes/_authed/settings/notifications'
+import { Route as AuthedAppAlertsImport } from './routes/_authed/app/alerts'
+import { Route as AuthedAppSettingsRouteImport } from './routes/_authed/app/settings/route'
+import { Route as AuthedAppDashboardRouteImport } from './routes/_authed/app/dashboard/route'
+import { Route as AuthedAppBillingRouteImport } from './routes/_authed/app/billing/route'
+import { Route as AuthedAppSettingsIndexImport } from './routes/_authed/app/settings/index'
+import { Route as AuthedAppDashboardIndexImport } from './routes/_authed/app/dashboard/index'
+import { Route as AuthedAppBillingIndexImport } from './routes/_authed/app/billing/index'
+import { Route as AuthedAppSettingsSecurityImport } from './routes/_authed/app/settings/security'
+import { Route as AuthedAppSettingsProfileImport } from './routes/_authed/app/settings/profile'
+import { Route as AuthedAppSettingsNotificationsImport } from './routes/_authed/app/settings/notifications'
 
 // Create/Update Routes
 
@@ -124,46 +125,10 @@ const PathlessLayoutNestedLayoutRoute = PathlessLayoutNestedLayoutImport.update(
   } as any,
 )
 
-const AuthedAlertsRoute = AuthedAlertsImport.update({
-  id: '/alerts',
-  path: '/alerts',
+const AuthedAppIndexRoute = AuthedAppIndexImport.update({
+  id: '/app/',
+  path: '/app/',
   getParentRoute: () => AuthedRoute,
-} as any)
-
-const AuthedSettingsRouteRoute = AuthedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthedRoute,
-} as any)
-
-const AuthedDashboardRouteRoute = AuthedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthedRoute,
-} as any)
-
-const AuthedBillingRouteRoute = AuthedBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => AuthedRoute,
-} as any)
-
-const AuthedSettingsIndexRoute = AuthedSettingsIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthedSettingsRouteRoute,
-} as any)
-
-const AuthedDashboardIndexRoute = AuthedDashboardIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthedDashboardRouteRoute,
-} as any)
-
-const AuthedBillingIndexRoute = AuthedBillingIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthedBillingRouteRoute,
 } as any)
 
 const PostsPostIdDeepRoute = PostsPostIdDeepImport.update({
@@ -186,23 +151,65 @@ const PathlessLayoutNestedLayoutRouteARoute =
     getParentRoute: () => PathlessLayoutNestedLayoutRoute,
   } as any)
 
-const AuthedSettingsSecurityRoute = AuthedSettingsSecurityImport.update({
+const AuthedAppAlertsRoute = AuthedAppAlertsImport.update({
+  id: '/app/alerts',
+  path: '/app/alerts',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedAppSettingsRouteRoute = AuthedAppSettingsRouteImport.update({
+  id: '/app/settings',
+  path: '/app/settings',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedAppDashboardRouteRoute = AuthedAppDashboardRouteImport.update({
+  id: '/app/dashboard',
+  path: '/app/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedAppBillingRouteRoute = AuthedAppBillingRouteImport.update({
+  id: '/app/billing',
+  path: '/app/billing',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedAppSettingsIndexRoute = AuthedAppSettingsIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedAppSettingsRouteRoute,
+} as any)
+
+const AuthedAppDashboardIndexRoute = AuthedAppDashboardIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedAppDashboardRouteRoute,
+} as any)
+
+const AuthedAppBillingIndexRoute = AuthedAppBillingIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedAppBillingRouteRoute,
+} as any)
+
+const AuthedAppSettingsSecurityRoute = AuthedAppSettingsSecurityImport.update({
   id: '/security',
   path: '/security',
-  getParentRoute: () => AuthedSettingsRouteRoute,
+  getParentRoute: () => AuthedAppSettingsRouteRoute,
 } as any)
 
-const AuthedSettingsProfileRoute = AuthedSettingsProfileImport.update({
+const AuthedAppSettingsProfileRoute = AuthedAppSettingsProfileImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => AuthedSettingsRouteRoute,
+  getParentRoute: () => AuthedAppSettingsRouteRoute,
 } as any)
 
-const AuthedSettingsNotificationsRoute =
-  AuthedSettingsNotificationsImport.update({
+const AuthedAppSettingsNotificationsRoute =
+  AuthedAppSettingsNotificationsImport.update({
     id: '/notifications',
     path: '/notifications',
-    getParentRoute: () => AuthedSettingsRouteRoute,
+    getParentRoute: () => AuthedAppSettingsRouteRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -272,34 +279,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
-    '/_authed/billing': {
-      id: '/_authed/billing'
-      path: '/billing'
-      fullPath: '/billing'
-      preLoaderRoute: typeof AuthedBillingRouteImport
-      parentRoute: typeof AuthedImport
-    }
-    '/_authed/dashboard': {
-      id: '/_authed/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthedDashboardRouteImport
-      parentRoute: typeof AuthedImport
-    }
-    '/_authed/settings': {
-      id: '/_authed/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthedSettingsRouteImport
-      parentRoute: typeof AuthedImport
-    }
-    '/_authed/alerts': {
-      id: '/_authed/alerts'
-      path: '/alerts'
-      fullPath: '/alerts'
-      preLoaderRoute: typeof AuthedAlertsImport
-      parentRoute: typeof AuthedImport
-    }
     '/_pathlessLayout/_nested-layout': {
       id: '/_pathlessLayout/_nested-layout'
       path: ''
@@ -335,26 +314,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersIndexImport
       parentRoute: typeof UsersRouteImport
     }
-    '/_authed/settings/notifications': {
-      id: '/_authed/settings/notifications'
-      path: '/notifications'
-      fullPath: '/settings/notifications'
-      preLoaderRoute: typeof AuthedSettingsNotificationsImport
-      parentRoute: typeof AuthedSettingsRouteImport
+    '/_authed/app/billing': {
+      id: '/_authed/app/billing'
+      path: '/app/billing'
+      fullPath: '/app/billing'
+      preLoaderRoute: typeof AuthedAppBillingRouteImport
+      parentRoute: typeof AuthedImport
     }
-    '/_authed/settings/profile': {
-      id: '/_authed/settings/profile'
-      path: '/profile'
-      fullPath: '/settings/profile'
-      preLoaderRoute: typeof AuthedSettingsProfileImport
-      parentRoute: typeof AuthedSettingsRouteImport
+    '/_authed/app/dashboard': {
+      id: '/_authed/app/dashboard'
+      path: '/app/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AuthedAppDashboardRouteImport
+      parentRoute: typeof AuthedImport
     }
-    '/_authed/settings/security': {
-      id: '/_authed/settings/security'
-      path: '/security'
-      fullPath: '/settings/security'
-      preLoaderRoute: typeof AuthedSettingsSecurityImport
-      parentRoute: typeof AuthedSettingsRouteImport
+    '/_authed/app/settings': {
+      id: '/_authed/app/settings'
+      path: '/app/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AuthedAppSettingsRouteImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/app/alerts': {
+      id: '/_authed/app/alerts'
+      path: '/app/alerts'
+      fullPath: '/app/alerts'
+      preLoaderRoute: typeof AuthedAppAlertsImport
+      parentRoute: typeof AuthedImport
     }
     '/_pathlessLayout/_nested-layout/route-a': {
       id: '/_pathlessLayout/_nested-layout/route-a'
@@ -377,26 +363,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsPostIdDeepImport
       parentRoute: typeof rootRoute
     }
-    '/_authed/billing/': {
-      id: '/_authed/billing/'
-      path: '/'
-      fullPath: '/billing/'
-      preLoaderRoute: typeof AuthedBillingIndexImport
-      parentRoute: typeof AuthedBillingRouteImport
+    '/_authed/app/': {
+      id: '/_authed/app/'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthedAppIndexImport
+      parentRoute: typeof AuthedImport
     }
-    '/_authed/dashboard/': {
-      id: '/_authed/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof AuthedDashboardIndexImport
-      parentRoute: typeof AuthedDashboardRouteImport
+    '/_authed/app/settings/notifications': {
+      id: '/_authed/app/settings/notifications'
+      path: '/notifications'
+      fullPath: '/app/settings/notifications'
+      preLoaderRoute: typeof AuthedAppSettingsNotificationsImport
+      parentRoute: typeof AuthedAppSettingsRouteImport
     }
-    '/_authed/settings/': {
-      id: '/_authed/settings/'
+    '/_authed/app/settings/profile': {
+      id: '/_authed/app/settings/profile'
+      path: '/profile'
+      fullPath: '/app/settings/profile'
+      preLoaderRoute: typeof AuthedAppSettingsProfileImport
+      parentRoute: typeof AuthedAppSettingsRouteImport
+    }
+    '/_authed/app/settings/security': {
+      id: '/_authed/app/settings/security'
+      path: '/security'
+      fullPath: '/app/settings/security'
+      preLoaderRoute: typeof AuthedAppSettingsSecurityImport
+      parentRoute: typeof AuthedAppSettingsRouteImport
+    }
+    '/_authed/app/billing/': {
+      id: '/_authed/app/billing/'
       path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthedSettingsIndexImport
-      parentRoute: typeof AuthedSettingsRouteImport
+      fullPath: '/app/billing/'
+      preLoaderRoute: typeof AuthedAppBillingIndexImport
+      parentRoute: typeof AuthedAppBillingRouteImport
+    }
+    '/_authed/app/dashboard/': {
+      id: '/_authed/app/dashboard/'
+      path: '/'
+      fullPath: '/app/dashboard/'
+      preLoaderRoute: typeof AuthedAppDashboardIndexImport
+      parentRoute: typeof AuthedAppDashboardRouteImport
+    }
+    '/_authed/app/settings/': {
+      id: '/_authed/app/settings/'
+      path: '/'
+      fullPath: '/app/settings/'
+      preLoaderRoute: typeof AuthedAppSettingsIndexImport
+      parentRoute: typeof AuthedAppSettingsRouteImport
     }
   }
 }
@@ -431,57 +445,67 @@ const UsersRouteRouteWithChildren = UsersRouteRoute._addFileChildren(
   UsersRouteRouteChildren,
 )
 
-interface AuthedBillingRouteRouteChildren {
-  AuthedBillingIndexRoute: typeof AuthedBillingIndexRoute
+interface AuthedAppBillingRouteRouteChildren {
+  AuthedAppBillingIndexRoute: typeof AuthedAppBillingIndexRoute
 }
 
-const AuthedBillingRouteRouteChildren: AuthedBillingRouteRouteChildren = {
-  AuthedBillingIndexRoute: AuthedBillingIndexRoute,
+const AuthedAppBillingRouteRouteChildren: AuthedAppBillingRouteRouteChildren = {
+  AuthedAppBillingIndexRoute: AuthedAppBillingIndexRoute,
 }
 
-const AuthedBillingRouteRouteWithChildren =
-  AuthedBillingRouteRoute._addFileChildren(AuthedBillingRouteRouteChildren)
+const AuthedAppBillingRouteRouteWithChildren =
+  AuthedAppBillingRouteRoute._addFileChildren(
+    AuthedAppBillingRouteRouteChildren,
+  )
 
-interface AuthedDashboardRouteRouteChildren {
-  AuthedDashboardIndexRoute: typeof AuthedDashboardIndexRoute
+interface AuthedAppDashboardRouteRouteChildren {
+  AuthedAppDashboardIndexRoute: typeof AuthedAppDashboardIndexRoute
 }
 
-const AuthedDashboardRouteRouteChildren: AuthedDashboardRouteRouteChildren = {
-  AuthedDashboardIndexRoute: AuthedDashboardIndexRoute,
+const AuthedAppDashboardRouteRouteChildren: AuthedAppDashboardRouteRouteChildren =
+  {
+    AuthedAppDashboardIndexRoute: AuthedAppDashboardIndexRoute,
+  }
+
+const AuthedAppDashboardRouteRouteWithChildren =
+  AuthedAppDashboardRouteRoute._addFileChildren(
+    AuthedAppDashboardRouteRouteChildren,
+  )
+
+interface AuthedAppSettingsRouteRouteChildren {
+  AuthedAppSettingsNotificationsRoute: typeof AuthedAppSettingsNotificationsRoute
+  AuthedAppSettingsProfileRoute: typeof AuthedAppSettingsProfileRoute
+  AuthedAppSettingsSecurityRoute: typeof AuthedAppSettingsSecurityRoute
+  AuthedAppSettingsIndexRoute: typeof AuthedAppSettingsIndexRoute
 }
 
-const AuthedDashboardRouteRouteWithChildren =
-  AuthedDashboardRouteRoute._addFileChildren(AuthedDashboardRouteRouteChildren)
+const AuthedAppSettingsRouteRouteChildren: AuthedAppSettingsRouteRouteChildren =
+  {
+    AuthedAppSettingsNotificationsRoute: AuthedAppSettingsNotificationsRoute,
+    AuthedAppSettingsProfileRoute: AuthedAppSettingsProfileRoute,
+    AuthedAppSettingsSecurityRoute: AuthedAppSettingsSecurityRoute,
+    AuthedAppSettingsIndexRoute: AuthedAppSettingsIndexRoute,
+  }
 
-interface AuthedSettingsRouteRouteChildren {
-  AuthedSettingsNotificationsRoute: typeof AuthedSettingsNotificationsRoute
-  AuthedSettingsProfileRoute: typeof AuthedSettingsProfileRoute
-  AuthedSettingsSecurityRoute: typeof AuthedSettingsSecurityRoute
-  AuthedSettingsIndexRoute: typeof AuthedSettingsIndexRoute
-}
-
-const AuthedSettingsRouteRouteChildren: AuthedSettingsRouteRouteChildren = {
-  AuthedSettingsNotificationsRoute: AuthedSettingsNotificationsRoute,
-  AuthedSettingsProfileRoute: AuthedSettingsProfileRoute,
-  AuthedSettingsSecurityRoute: AuthedSettingsSecurityRoute,
-  AuthedSettingsIndexRoute: AuthedSettingsIndexRoute,
-}
-
-const AuthedSettingsRouteRouteWithChildren =
-  AuthedSettingsRouteRoute._addFileChildren(AuthedSettingsRouteRouteChildren)
+const AuthedAppSettingsRouteRouteWithChildren =
+  AuthedAppSettingsRouteRoute._addFileChildren(
+    AuthedAppSettingsRouteRouteChildren,
+  )
 
 interface AuthedRouteChildren {
-  AuthedBillingRouteRoute: typeof AuthedBillingRouteRouteWithChildren
-  AuthedDashboardRouteRoute: typeof AuthedDashboardRouteRouteWithChildren
-  AuthedSettingsRouteRoute: typeof AuthedSettingsRouteRouteWithChildren
-  AuthedAlertsRoute: typeof AuthedAlertsRoute
+  AuthedAppBillingRouteRoute: typeof AuthedAppBillingRouteRouteWithChildren
+  AuthedAppDashboardRouteRoute: typeof AuthedAppDashboardRouteRouteWithChildren
+  AuthedAppSettingsRouteRoute: typeof AuthedAppSettingsRouteRouteWithChildren
+  AuthedAppAlertsRoute: typeof AuthedAppAlertsRoute
+  AuthedAppIndexRoute: typeof AuthedAppIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedBillingRouteRoute: AuthedBillingRouteRouteWithChildren,
-  AuthedDashboardRouteRoute: AuthedDashboardRouteRouteWithChildren,
-  AuthedSettingsRouteRoute: AuthedSettingsRouteRouteWithChildren,
-  AuthedAlertsRoute: AuthedAlertsRoute,
+  AuthedAppBillingRouteRoute: AuthedAppBillingRouteRouteWithChildren,
+  AuthedAppDashboardRouteRoute: AuthedAppDashboardRouteRouteWithChildren,
+  AuthedAppSettingsRouteRoute: AuthedAppSettingsRouteRouteWithChildren,
+  AuthedAppAlertsRoute: AuthedAppAlertsRoute,
+  AuthedAppIndexRoute: AuthedAppIndexRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -526,23 +550,24 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/redirect': typeof RedirectRoute
   '/register': typeof RegisterRoute
-  '/billing': typeof AuthedBillingRouteRouteWithChildren
-  '/dashboard': typeof AuthedDashboardRouteRouteWithChildren
-  '/settings': typeof AuthedSettingsRouteRouteWithChildren
-  '/alerts': typeof AuthedAlertsRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/users/': typeof UsersIndexRoute
-  '/settings/notifications': typeof AuthedSettingsNotificationsRoute
-  '/settings/profile': typeof AuthedSettingsProfileRoute
-  '/settings/security': typeof AuthedSettingsSecurityRoute
+  '/app/billing': typeof AuthedAppBillingRouteRouteWithChildren
+  '/app/dashboard': typeof AuthedAppDashboardRouteRouteWithChildren
+  '/app/settings': typeof AuthedAppSettingsRouteRouteWithChildren
+  '/app/alerts': typeof AuthedAppAlertsRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
-  '/billing/': typeof AuthedBillingIndexRoute
-  '/dashboard/': typeof AuthedDashboardIndexRoute
-  '/settings/': typeof AuthedSettingsIndexRoute
+  '/app': typeof AuthedAppIndexRoute
+  '/app/settings/notifications': typeof AuthedAppSettingsNotificationsRoute
+  '/app/settings/profile': typeof AuthedAppSettingsProfileRoute
+  '/app/settings/security': typeof AuthedAppSettingsSecurityRoute
+  '/app/billing/': typeof AuthedAppBillingIndexRoute
+  '/app/dashboard/': typeof AuthedAppDashboardIndexRoute
+  '/app/settings/': typeof AuthedAppSettingsIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -552,20 +577,21 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/redirect': typeof RedirectRoute
   '/register': typeof RegisterRoute
-  '/alerts': typeof AuthedAlertsRoute
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts': typeof PostsIndexRoute
   '/users': typeof UsersIndexRoute
-  '/settings/notifications': typeof AuthedSettingsNotificationsRoute
-  '/settings/profile': typeof AuthedSettingsProfileRoute
-  '/settings/security': typeof AuthedSettingsSecurityRoute
+  '/app/alerts': typeof AuthedAppAlertsRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
-  '/billing': typeof AuthedBillingIndexRoute
-  '/dashboard': typeof AuthedDashboardIndexRoute
-  '/settings': typeof AuthedSettingsIndexRoute
+  '/app': typeof AuthedAppIndexRoute
+  '/app/settings/notifications': typeof AuthedAppSettingsNotificationsRoute
+  '/app/settings/profile': typeof AuthedAppSettingsProfileRoute
+  '/app/settings/security': typeof AuthedAppSettingsSecurityRoute
+  '/app/billing': typeof AuthedAppBillingIndexRoute
+  '/app/dashboard': typeof AuthedAppDashboardIndexRoute
+  '/app/settings': typeof AuthedAppSettingsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -579,24 +605,25 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/redirect': typeof RedirectRoute
   '/register': typeof RegisterRoute
-  '/_authed/billing': typeof AuthedBillingRouteRouteWithChildren
-  '/_authed/dashboard': typeof AuthedDashboardRouteRouteWithChildren
-  '/_authed/settings': typeof AuthedSettingsRouteRouteWithChildren
-  '/_authed/alerts': typeof AuthedAlertsRoute
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/users/': typeof UsersIndexRoute
-  '/_authed/settings/notifications': typeof AuthedSettingsNotificationsRoute
-  '/_authed/settings/profile': typeof AuthedSettingsProfileRoute
-  '/_authed/settings/security': typeof AuthedSettingsSecurityRoute
+  '/_authed/app/billing': typeof AuthedAppBillingRouteRouteWithChildren
+  '/_authed/app/dashboard': typeof AuthedAppDashboardRouteRouteWithChildren
+  '/_authed/app/settings': typeof AuthedAppSettingsRouteRouteWithChildren
+  '/_authed/app/alerts': typeof AuthedAppAlertsRoute
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
-  '/_authed/billing/': typeof AuthedBillingIndexRoute
-  '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
-  '/_authed/settings/': typeof AuthedSettingsIndexRoute
+  '/_authed/app/': typeof AuthedAppIndexRoute
+  '/_authed/app/settings/notifications': typeof AuthedAppSettingsNotificationsRoute
+  '/_authed/app/settings/profile': typeof AuthedAppSettingsProfileRoute
+  '/_authed/app/settings/security': typeof AuthedAppSettingsSecurityRoute
+  '/_authed/app/billing/': typeof AuthedAppBillingIndexRoute
+  '/_authed/app/dashboard/': typeof AuthedAppDashboardIndexRoute
+  '/_authed/app/settings/': typeof AuthedAppSettingsIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -610,23 +637,24 @@ export interface FileRouteTypes {
     | '/login'
     | '/redirect'
     | '/register'
-    | '/billing'
-    | '/dashboard'
-    | '/settings'
-    | '/alerts'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts/'
     | '/users/'
-    | '/settings/notifications'
-    | '/settings/profile'
-    | '/settings/security'
+    | '/app/billing'
+    | '/app/dashboard'
+    | '/app/settings'
+    | '/app/alerts'
     | '/route-a'
     | '/route-b'
     | '/posts/$postId/deep'
-    | '/billing/'
-    | '/dashboard/'
-    | '/settings/'
+    | '/app'
+    | '/app/settings/notifications'
+    | '/app/settings/profile'
+    | '/app/settings/security'
+    | '/app/billing/'
+    | '/app/dashboard/'
+    | '/app/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -635,20 +663,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/redirect'
     | '/register'
-    | '/alerts'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts'
     | '/users'
-    | '/settings/notifications'
-    | '/settings/profile'
-    | '/settings/security'
+    | '/app/alerts'
     | '/route-a'
     | '/route-b'
     | '/posts/$postId/deep'
-    | '/billing'
-    | '/dashboard'
-    | '/settings'
+    | '/app'
+    | '/app/settings/notifications'
+    | '/app/settings/profile'
+    | '/app/settings/security'
+    | '/app/billing'
+    | '/app/dashboard'
+    | '/app/settings'
   id:
     | '__root__'
     | '/'
@@ -660,24 +689,25 @@ export interface FileRouteTypes {
     | '/login'
     | '/redirect'
     | '/register'
-    | '/_authed/billing'
-    | '/_authed/dashboard'
-    | '/_authed/settings'
-    | '/_authed/alerts'
     | '/_pathlessLayout/_nested-layout'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts/'
     | '/users/'
-    | '/_authed/settings/notifications'
-    | '/_authed/settings/profile'
-    | '/_authed/settings/security'
+    | '/_authed/app/billing'
+    | '/_authed/app/dashboard'
+    | '/_authed/app/settings'
+    | '/_authed/app/alerts'
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
     | '/posts_/$postId/deep'
-    | '/_authed/billing/'
-    | '/_authed/dashboard/'
-    | '/_authed/settings/'
+    | '/_authed/app/'
+    | '/_authed/app/settings/notifications'
+    | '/_authed/app/settings/profile'
+    | '/_authed/app/settings/security'
+    | '/_authed/app/billing/'
+    | '/_authed/app/dashboard/'
+    | '/_authed/app/settings/'
   fileRoutesById: FileRoutesById
 }
 
@@ -749,10 +779,11 @@ export const routeTree = rootRoute
     "/_authed": {
       "filePath": "_authed.tsx",
       "children": [
-        "/_authed/billing",
-        "/_authed/dashboard",
-        "/_authed/settings",
-        "/_authed/alerts"
+        "/_authed/app/billing",
+        "/_authed/app/dashboard",
+        "/_authed/app/settings",
+        "/_authed/app/alerts",
+        "/_authed/app/"
       ]
     },
     "/_pathlessLayout": {
@@ -772,34 +803,6 @@ export const routeTree = rootRoute
     },
     "/register": {
       "filePath": "register.tsx"
-    },
-    "/_authed/billing": {
-      "filePath": "_authed/billing/route.tsx",
-      "parent": "/_authed",
-      "children": [
-        "/_authed/billing/"
-      ]
-    },
-    "/_authed/dashboard": {
-      "filePath": "_authed/dashboard/route.tsx",
-      "parent": "/_authed",
-      "children": [
-        "/_authed/dashboard/"
-      ]
-    },
-    "/_authed/settings": {
-      "filePath": "_authed/settings/route.tsx",
-      "parent": "/_authed",
-      "children": [
-        "/_authed/settings/notifications",
-        "/_authed/settings/profile",
-        "/_authed/settings/security",
-        "/_authed/settings/"
-      ]
-    },
-    "/_authed/alerts": {
-      "filePath": "_authed/alerts.tsx",
-      "parent": "/_authed"
     },
     "/_pathlessLayout/_nested-layout": {
       "filePath": "_pathlessLayout/_nested-layout.tsx",
@@ -825,17 +828,33 @@ export const routeTree = rootRoute
       "filePath": "users.index.tsx",
       "parent": "/users"
     },
-    "/_authed/settings/notifications": {
-      "filePath": "_authed/settings/notifications.tsx",
-      "parent": "/_authed/settings"
+    "/_authed/app/billing": {
+      "filePath": "_authed/app/billing/route.tsx",
+      "parent": "/_authed",
+      "children": [
+        "/_authed/app/billing/"
+      ]
     },
-    "/_authed/settings/profile": {
-      "filePath": "_authed/settings/profile.tsx",
-      "parent": "/_authed/settings"
+    "/_authed/app/dashboard": {
+      "filePath": "_authed/app/dashboard/route.tsx",
+      "parent": "/_authed",
+      "children": [
+        "/_authed/app/dashboard/"
+      ]
     },
-    "/_authed/settings/security": {
-      "filePath": "_authed/settings/security.tsx",
-      "parent": "/_authed/settings"
+    "/_authed/app/settings": {
+      "filePath": "_authed/app/settings/route.tsx",
+      "parent": "/_authed",
+      "children": [
+        "/_authed/app/settings/notifications",
+        "/_authed/app/settings/profile",
+        "/_authed/app/settings/security",
+        "/_authed/app/settings/"
+      ]
+    },
+    "/_authed/app/alerts": {
+      "filePath": "_authed/app/alerts.tsx",
+      "parent": "/_authed"
     },
     "/_pathlessLayout/_nested-layout/route-a": {
       "filePath": "_pathlessLayout/_nested-layout/route-a.tsx",
@@ -848,17 +867,33 @@ export const routeTree = rootRoute
     "/posts_/$postId/deep": {
       "filePath": "posts_.$postId.deep.tsx"
     },
-    "/_authed/billing/": {
-      "filePath": "_authed/billing/index.tsx",
-      "parent": "/_authed/billing"
+    "/_authed/app/": {
+      "filePath": "_authed/app/index.tsx",
+      "parent": "/_authed"
     },
-    "/_authed/dashboard/": {
-      "filePath": "_authed/dashboard/index.tsx",
-      "parent": "/_authed/dashboard"
+    "/_authed/app/settings/notifications": {
+      "filePath": "_authed/app/settings/notifications.tsx",
+      "parent": "/_authed/app/settings"
     },
-    "/_authed/settings/": {
-      "filePath": "_authed/settings/index.tsx",
-      "parent": "/_authed/settings"
+    "/_authed/app/settings/profile": {
+      "filePath": "_authed/app/settings/profile.tsx",
+      "parent": "/_authed/app/settings"
+    },
+    "/_authed/app/settings/security": {
+      "filePath": "_authed/app/settings/security.tsx",
+      "parent": "/_authed/app/settings"
+    },
+    "/_authed/app/billing/": {
+      "filePath": "_authed/app/billing/index.tsx",
+      "parent": "/_authed/app/billing"
+    },
+    "/_authed/app/dashboard/": {
+      "filePath": "_authed/app/dashboard/index.tsx",
+      "parent": "/_authed/app/dashboard"
+    },
+    "/_authed/app/settings/": {
+      "filePath": "_authed/app/settings/index.tsx",
+      "parent": "/_authed/app/settings"
     }
   }
 }

@@ -1,4 +1,5 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter, redirect } from '@tanstack/react-router'
+import { checkAuthFn } from '~/routes/_authed/-server'
 import { useMutation } from '~/hooks/useMutation'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -23,6 +24,15 @@ type AuthResponse = {
 }
 
 export const Route = createFileRoute('/register')({
+  loader: async () => {
+    const response = await checkAuthFn()
+    if (response?.user && !response.error) {
+      throw redirect({
+        to: '/app',
+      })
+    }
+    return null
+  },
   component: RegisterPage,
 })
 
@@ -40,7 +50,12 @@ function RegisterPage() {
           description: "Account created successfully. Please check your email to confirm your account.",
           variant: "default",
         })
-        router.navigate({ to: '/login' })
+        router.navigate({
+          to: '/login',
+          search: {
+            redirect: undefined
+          }
+        })
       } else {
         toast({
           title: "Error",
@@ -103,7 +118,12 @@ function RegisterPage() {
         <div className="text-center mt-4">
           <span className="text-muted-foreground">Already have an account? </span>
           <button
-            onClick={() => router.navigate({ to: '/login' })}
+            onClick={() => router.navigate({
+              to: '/login',
+              search: {
+                redirect: undefined
+              }
+            })}
             className="text-primary hover:underline"
             type="button"
           >

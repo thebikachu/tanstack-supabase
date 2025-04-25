@@ -1,10 +1,25 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import { PublicNav } from '~/components/PublicNav'
 import { Footer } from '~/components/Footer'
+import { useCallback } from 'react'
+
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    const headerOffset = 80;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+};
 
 export const Route = createFileRoute('/')({
-  component: LandingPage,
+  component: LandingPage
 })
 
 function LandingPage() {
@@ -12,8 +27,8 @@ function LandingPage() {
     <div className="flex flex-col">
       <PublicNav />
       {/* Hero Section */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
+      <section className="bg-white min-h-[calc(100vh-64px)] flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16">
           <div className="text-center">
             <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
               <span className="block">Modern SaaS Template</span>
@@ -33,12 +48,12 @@ function LandingPage() {
                 </Link>
               </div>
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                <a
-                  href="#features"
+                <button
+                  onClick={() => scrollToSection('features')}
                   className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
                 >
                   Learn more
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -46,7 +61,7 @@ function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 bg-gray-50">
+      <section id="features" className="py-32 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -86,7 +101,7 @@ function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-16 bg-white">
+      <section id="pricing" className="py-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">

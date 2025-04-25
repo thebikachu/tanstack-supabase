@@ -1,12 +1,24 @@
-# Welcome to TanStack.com!
+# SaaS Template with TanStack Router
 
-This site is built with TanStack Router!
+A modern SaaS template built with React, TypeScript, and TanStack Router, featuring authentication, protected routes, and a clean architecture.
 
-- [TanStack Router Docs](https://tanstack.com/router)
+## Features
 
-It's deployed automagically with Netlify!
+- 🔐 Authentication with Supabase (auth only)
+- 🛡️ Protected routes under /app
+- 🎨 Styled with Tailwind CSS and Framer Motion
+- 📡 Type-safe routing with TanStack Router
+- 🔄 Server state management with TanStack Query
+- 🏗️ Clean architecture with feature-based organization
 
-- [Netlify](https://netlify.com/)
+## Tech Stack
+
+- Frontend: React + TypeScript + Vite
+- Routing: TanStack Router
+- State Management: TanStack Query
+- Styling: Tailwind CSS + Framer Motion
+- Authentication: Supabase (auth only)
+- Backend: FastAPI (Python)
 
 ## Development
 
@@ -19,54 +31,37 @@ pnpm dev
 
 This starts your app in development mode, rebuilding assets on file changes.
 
-## Editing and previewing the docs of TanStack projects locally
+## Project Structure
 
-The documentations for all TanStack projects except for `React Charts` are hosted on [https://tanstack.com](https://tanstack.com), powered by this TanStack Router app.
-In production, the markdown doc pages are fetched from the GitHub repos of the projects, but in development they are read from the local file system.
-
-Follow these steps if you want to edit the doc pages of a project (in these steps we'll assume it's [`TanStack/form`](https://github.com/tanstack/form)) and preview them locally :
-
-1. Create a new directory called `tanstack`.
-
-```sh
-mkdir tanstack
+```
+src/
+├── routes/
+│   ├── _authed/           # Protected routes container
+│   │   ├── -server.ts     # Auth server functions
+│   │   └── app/          # Protected application routes
+│   │       ├── alerts/
+│   │       ├── billing/
+│   │       ├── dashboard/
+│   │       └── settings/
+│   ├── __root.tsx         # Root layout
+│   ├── _authed.tsx        # Auth layout
+│   └── index.tsx          # Public home
+├── components/
+│   ├── ui/               # Shared UI components
+│   └── [feature]/        # Feature-specific components
+└── hooks/                # Custom hooks
 ```
 
-2. Enter the directory and clone this repo and the repo of the project there.
+## Documentation
 
-```sh
-cd tanstack
-git clone git@github.com:TanStack/tanstack.com.git
-git clone git@github.com:TanStack/form.git
-```
+For detailed documentation, see:
+- docs/tanstack-core-concepts.md (Architecture)
+- docs/middleware.md (Server functions)
+- docs/auth-system.md (Authentication)
 
-> [!NOTE]
-> Your `tanstack` directory should look like this:
->
-> ```
-> tanstack/
->    |
->    +-- form/
->    |
->    +-- tanstack.com/
-> ```
+## Important Notes
 
-> [!WARNING]
-> Make sure the name of the directory in your local file system matches the name of the project's repo. For example, `tanstack/form` must be cloned into `form` (this is the default) instead of `some-other-name`, because that way, the doc pages won't be found.
-
-3. Enter the `tanstack/tanstack.com` directory, install the dependencies and run the app in dev mode:
-
-```sh
-cd tanstack.com
-pnpm i
-# The app will run on https://localhost:3000 by default
-pnpm dev
-```
-
-4. Now you can visit http://localhost:3000/form/latest/docs/overview in the browser and see the changes you make in `tanstack/form/docs`.
-
-> [!NOTE]
-> The updated pages need to be manually reloaded in the browser.
-
-> [!WARNING]
-> You will need to update the `docs/config.json` file (in the project's repo) if you add a new doc page!
+- Supabase is used for authentication ONLY, not for database access
+- All sensitive operations happen server-side
+- Protected routes are under the /app path
+- Follow the existing patterns for consistency

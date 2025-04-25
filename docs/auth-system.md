@@ -105,15 +105,36 @@ The system implements a robust redirect mechanism:
    - Current path is saved in login page's search params
    - User is redirected to login page
 
-2. After successful login:
+2. When accessing login/register pages while authenticated:
+   - User is automatically redirected to '/app'
+   - Uses `checkAuthFn` to verify authentication status
+   - Prevents authenticated users from accessing auth pages unnecessarily
+
+3. After successful login:
    - Checks for redirect URL in search params
    - Navigates to saved destination or defaults to dashboard
    - Uses `replace: true` to prevent back-button issues
 
-3. After logout:
+4. After logout:
    - Redirects to login page
    - Clears any saved redirects
    - Uses `replace: true` to prevent navigation back to protected routes
+
+Example of auth check in login/register routes:
+```typescript
+export const Route = createFileRoute('/login')({
+  loader: async () => {
+    const response = await checkAuthFn()
+    if (response?.user && !response.error) {
+      throw redirect({
+        to: '/app',
+      })
+    }
+    return null
+  },
+  component: LoginPage,
+})
+```
 
 ## Response Types
 
