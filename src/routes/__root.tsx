@@ -5,6 +5,7 @@ import {
   createRootRoute,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
@@ -63,10 +64,14 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
+const queryClient = new QueryClient()
+
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
     </RootDocument>
   )
 }

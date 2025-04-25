@@ -1,11 +1,60 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { Suspense } from 'react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Card } from '~/components/ui/card'
+import { getBillingInfo } from './-server'
 
 export const Route = createFileRoute('/_authed/app/billing')({
   component: BillingLayout,
 })
 
-function BillingLayout() {
+function BillingInfoSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="h-8 w-32 bg-gray-200 rounded animate-pulse mb-2"></div>
+        <div className="h-4 w-64 bg-gray-200 rounded animate-pulse"></div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="p-6">
+          <div className="space-y-4 animate-pulse">
+            <div className="h-6 w-32 bg-gray-200 rounded"></div>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex justify-between">
+                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                <div className="h-4 w-20 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="space-y-4 animate-pulse">
+            <div className="h-6 w-40 bg-gray-200 rounded"></div>
+            {[1, 2].map((i) => (
+              <div key={i} className="flex justify-between">
+                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                <div className="h-4 w-20 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card className="p-6">
+        <Outlet />
+      </Card>
+    </div>
+  )
+}
+
+function BillingInfoContent() {
+  const { data } = useSuspenseQuery({
+    queryKey: ['billing-info'],
+    queryFn: () => getBillingInfo(),
+  })
+
   return (
     <div className="space-y-6">
       <div>
@@ -21,19 +70,19 @@ function BillingLayout() {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Plan</span>
-              <span className="font-medium">Pro</span>
+              <span className="font-medium">{data.plan.name}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Billing Period</span>
-              <span className="font-medium">Monthly</span>
+              <span className="font-medium">{data.plan.billingPeriod}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Amount</span>
-              <span className="font-medium">$29/month</span>
+              <span className="font-medium">${data.plan.amount}/month</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Next Payment</span>
-              <span className="font-medium">May 1, 2024</span>
+              <span className="font-medium">{data.plan.nextPayment}</span>
             </div>
           </div>
         </Card>
@@ -43,11 +92,11 @@ function BillingLayout() {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Card</span>
-              <span className="font-medium">•••• 4242</span>
+              <span className="font-medium">•••• {data.paymentMethod.cardLast4}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Expires</span>
-              <span className="font-medium">04/2025</span>
+              <span className="font-medium">{data.paymentMethod.expiryDate}</span>
             </div>
           </div>
         </Card>
@@ -57,5 +106,13 @@ function BillingLayout() {
         <Outlet />
       </Card>
     </div>
+  )
+}
+
+function BillingLayout() {
+  return (
+    <Suspense fallback={<BillingInfoSkeleton />}>
+      <BillingInfoContent />
+    </Suspense>
   )
 }
