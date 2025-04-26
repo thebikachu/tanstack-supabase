@@ -2,9 +2,8 @@ import { Link, useLocation, useNavigate, useRouter } from '@tanstack/react-route
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HamburgerMenu } from './ui/hamburger-menu';
-import { useMutation } from '~/hooks/useMutation';
+import { useAuth } from '~/auth/AuthContext';
 import { useToast } from '~/hooks/use-toast';
-import { logoutFn } from '~/routes/_authed/-server';
 
 // Animation variants
 const menuVariants = {
