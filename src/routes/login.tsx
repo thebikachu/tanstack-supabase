@@ -1,5 +1,6 @@
-import { createFileRoute, useRouter, redirect } from '@tanstack/react-router'
-import { checkAuthFn } from '~/routes/_authed/-server'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { useAuth } from '~/auth/AuthContext'
+import { useEffect } from 'react'
 import { useMutation } from '~/hooks/useMutation'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -13,13 +14,7 @@ export const Route = createFileRoute('/login')({
       redirect: search.redirect as string | undefined,
     }
   },
-  loader: async () => {
-    const response = await checkAuthFn()
-    if (response?.user && !response.error) {
-      throw redirect({
-        to: '/app',
-      })
-    }
+  beforeLoad: ({ navigate }) => {
     return null
   },
   component: LoginPage,
@@ -28,12 +23,18 @@ export const Route = createFileRoute('/login')({
 function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { user, refreshAuth } = useAuth()
 
+  useEffect(() => {
+    if (user) {
+      router.navigate({ to: '/app', replace: true })
+    }
+  }, [user, router])
   const loginMutation = useMutation({
     fn: loginFn,
     onSuccess: async ({ data: response }) => {
       if (!response.error) {
-        await router.invalidate()
+        await refreshAuth()
         toast({
           title: "Success",
           description: "Successfully logged in",

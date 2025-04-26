@@ -3,6 +3,7 @@ import {
   Outlet,
   Scripts,
   createRootRoute,
+  type RegisteredRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -14,8 +15,21 @@ import { Footer } from '~/components/Footer'
 import { Toaster } from '~/components/ui/toaster'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
+import { AuthProvider } from '~/auth/AuthContext'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+})
 
 export const Route = createRootRoute({
+  context: () => ({
+    queryClient,
+  }),
   head: () => ({
     meta: [
       {
@@ -64,13 +78,13 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
-const queryClient = new QueryClient()
-
 function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <Outlet />
+        <AuthProvider>
+          <Outlet />
+        </AuthProvider>
       </QueryClientProvider>
     </RootDocument>
   )
@@ -83,7 +97,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-screen flex flex-col">
-      
         <main className="flex-1">
           {children}
         </main>

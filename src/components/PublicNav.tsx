@@ -1,49 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { Nav } from './Nav';
-import { useEffect, useState } from 'react';
-import { checkAuthFn } from '~/routes/_authed/-server';
-import { useMutation } from '~/hooks/useMutation';
-import { useToast } from '~/hooks/use-toast';
-import { logoutFn } from '~/routes/_authed/-server';
-import { useRouter } from '@tanstack/react-router';
+import { useAuth } from '~/auth/AuthContext';
 
 export function PublicNav() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const router = useRouter();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const response = await checkAuthFn();
-      setIsAuthenticated(!response.error && !!response.user);
-    };
-    checkAuth();
-  }, []);
-
-  const logoutMutation = useMutation({
-    fn: logoutFn,
-    onSuccess: async ({ data: response }) => {
-      if (!response.error) {
-        toast({
-          title: "Success",
-          description: "Successfully logged out",
-          variant: "default",
-        });
-        await router.invalidate();
-        router.navigate({
-          to: '/login',
-          search: { redirect: undefined },
-          replace: true
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: response.message || "Failed to logout",
-          variant: "destructive",
-        });
-      }
-    }
-  });
+  const { user, loading, logout } = useAuth();
 
   const links = [
     { to: '/', label: 'Home' },
@@ -72,11 +32,10 @@ export function PublicNav() {
         </span>
       </Link>
       <button
-        onClick={() => logoutMutation.mutate({})}
-        disabled={logoutMutation.status === 'pending'}
-        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+        onClick={logout}
+        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       >
-        {logoutMutation.status === 'pending' ? 'Signing out...' : 'Sign out'}
+        Sign out
       </button>
     </>
   );
@@ -99,9 +58,9 @@ export function PublicNav() {
     </>
   );
 
-  const rightButtons = isAuthenticated === null 
-    ? loadingButtons 
-    : isAuthenticated 
+  const rightButtons = loading
+    ? loadingButtons
+    : user
       ? authenticatedButtons 
       : unauthenticatedButtons;
 

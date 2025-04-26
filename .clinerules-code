@@ -9,95 +9,97 @@ You are an expert in TypeScript, Node.js, React, Vite, TanStack Query, TanStack 
    - Use TanStack server functions for API communication
    - Keep client code focused on UI/UX
 
-2. **Authentication & Authorization**
+2. **Authentication System**
    - Supabase for AUTH ONLY - no database access
-   - Server-side auth checks using middleware
+   - AuthContext pattern for state management
+   - Auto-refresh on tab focus and network reconnection
    - Protected routes under _authed/app layout
-   - Clean separation of public/protected components
+   - Server-side auth checks using middleware
 
 3. **Tech Stack**
    - Frontend: React + TypeScript + Vite
    - Routing: TanStack Router for type-safe routing
-   - State: TanStack Query for server state
+   - State: TanStack Query + React Context
    - Styling: Tailwind CSS + Framer Motion
    - Backend: FastAPI (Python) for business logic
-   - Auth: Supabase (auth only, no database)
+   - Auth: Supabase (auth only) + AuthContext
 
 4. **Code Organization**
-   - Feature-based structure under src/routes
-   - Shared components in src/components
-   - Server functions in -server.ts files
-   - UI components in components/ui
-   - Hooks in src/hooks
+   ```
+   src/
+   ├── auth/                # Authentication system
+   │   └── AuthContext.tsx  # Central auth management
+   ├── routes/
+   │   ├── _authed/        # Protected routes
+   │   │   ├── -server.ts  # Auth server functions
+   │   │   └── app/        # App routes
+   │   ├── __root.tsx      # Root with AuthProvider
+   │   └── _authed.tsx     # Auth protection
+   ├── components/
+   │   ├── ui/            # Shared UI components
+   │   └── [feature]/     # Feature components
+   └── middleware/        # Server middleware
+   ```
 
 5. **Best Practices**
+   - Use AuthContext for auth state
+   - Handle loading states appropriately
+   - Keep sensitive operations server-side
    - Type everything with TypeScript
-   - Use server functions for data operations
-   - Keep components small and focused
-   - Document complex logic
-   - Follow existing patterns for consistency
-
-## Key Directories
-
-```
-src/
-├── routes/
-│   ├── _authed/           # Protected routes container
-│   │   ├── -server.ts     # Auth server functions
-│   │   └── app/          # Protected application routes
-│   │       ├── alerts/
-│   │       ├── billing/
-│   │       ├── dashboard/
-│   │       └── settings/
-│   ├── __root.tsx         # Root layout
-│   ├── _authed.tsx        # Auth layout
-│   └── index.tsx          # Public home
-├── components/
-│   ├── ui/               # Shared UI components
-│   └── [feature]/        # Feature-specific components
-└── hooks/                # Custom hooks
-```
-
-## Documentation Requirements
-
-1. **Always check documentation first:**
-   - Product Requirements (PRDs)
-   - docs/tanstack-core-concepts.md (Architecture)
-   - docs/middleware.md (Server functions)
-   - docs/auth-system.md (Authentication)
-
-2. **Keep documentation updated:**
-   - Update relevant .md files when adding features
-   - Document complex patterns
-   - Keep this file current with new patterns
+   - Document significant changes
 
 ## Critical Rules
 
-1. NEVER USE SUPABASE FOR DATABASE ACCESS - Use FastAPI backend
-2. Keep auth logic server-side
-3. Follow existing patterns for consistency
-4. Document significant changes
-5. Ask for clarification when needed
-6. Clean up after significant changes:
-   - Update documentation to reflect new patterns
-   - Update .clinerules-code for high-level architectural changes
-   - Review and update README.md for project-wide changes
-   - Never document granular implementation details in high-level docs
+1. NEVER USE SUPABASE FOR DATABASE ACCESS
+   - Supabase is for authentication ONLY
+   - All database operations through FastAPI
 
-## Project Context & Understanding
+2. Authentication Rules
+   - Always use useAuth() hook for auth state
+   - Keep auth logic server-side
+   - Handle loading states properly
+   - Auto-refresh sessions appropriately
 
-1. **Documentation First:**
-   * **Always** check for and thoroughly review relevant project documentation *before* starting any task. This includes:
-       * Product Requirements Documents (PRDs)
-       * `docs\tanstack-core-concepts.md` (System architecture, component relationships)
-       * `docs\middleware.md` (For when dealing with server functions, supabase and createServerFn tasks)
-       * `docs\auth-system.md` (How the auth system works, when dealing with server function or API related tasks.)
-   * If documentation is missing, unclear, or conflicts with the request, **ask for clarification**. And then modify the documentation files.
+3. Code Organization
+   - Follow feature-based structure
+   - Keep components focused
+   - Use proper file naming
+   - Maintain clear separation of concerns
 
-2. **RULE MODIFICATION**
-   Then update this file here `.clinerules-code` as it contains your instructions that you can modify yourself to improve. Ask me always before modifying the rules.
+4. Documentation
+   - Check docs before starting tasks
+   - Update docs after changes
+   - Keep documentation in sync
+   - Use appropriate doc levels:
+     * High-level: README.md, .clinerules-code
+     * Technical: docs/*.md
+     * Implementation: component/feature docs
 
-3. **Main Route Structure**
-   - Public Routes: Accessible without authentication
-   - Protected Routes: Under _authed/app/* requiring authentication
-   - Auth Routes: Login/Register flows
+## Documentation Reference
+
+1. System Architecture:
+   - docs/tanstack-core-concepts.md
+   - docs/auth-system.md
+   - docs/middleware.md
+
+2. Implementation Details:
+   - src/routes/_authed/readme.md
+   - Component documentation
+   - Feature documentation
+
+## Route Structure
+
+1. Public Routes (/)
+   - Home, landing pages
+   - Login/Register
+   - Public information
+
+2. Protected Routes (/app/*)
+   - Require authentication
+   - Under _authed layout
+   - Use AuthContext protection
+
+3. API Routes
+   - Server functions
+   - Protected with middleware
+   - Type-safe operations

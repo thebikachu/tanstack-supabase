@@ -1,31 +1,41 @@
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { ProtectedNav } from '~/components/ProtectedNav'
 import { Footer } from '~/components/Footer'
-import { checkAuthFn } from './_authed/-server'
+import { useAuth } from '~/auth/AuthContext'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/_authed')({
-  staleTime: Infinity, // Cache for the entire session
-  loader: async ({ location }) => {
-    console.log('Running checkAuthFn in loader...');
-    const response = await checkAuthFn()
-
-    console.log('checkAuthFn response:', response)
-
-    if (!response?.user || response.error) {
-      throw redirect({
-        to: '/login',
-        search: {
-          redirect: location.pathname,
-        },
-      })
-    }
-
-    return { user: response.user }
-  },
   component: AuthedLayout,
 })
 
 function AuthedLayout() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.navigate({
+        to: '/login',
+        search: {
+          redirect: router.state.location.pathname,
+        },
+        replace: true
+      })
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <ProtectedNav />

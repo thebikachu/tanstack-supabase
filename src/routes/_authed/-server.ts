@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { getServerSupabase } from '~/utils/supabase'
+import { authMiddleware } from '~/middleware/authMiddleware'
 
 type LogoutResponse = {
   error: boolean
@@ -159,6 +160,34 @@ export const logoutFn = createServerFn({ method: 'POST' })
 
     return {
       error: false
+    }
+  })
+
+type GetCreditsResponse = {
+  error: boolean
+  message?: string
+  credits?: number
+}
+
+export const getCredits = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({context}): Promise<GetCreditsResponse> => {
+    const user = context.user
+
+    if (!user) {
+      return {
+        error: true,
+        message: 'Not authenticated'
+      }
+    }
+
+    // TODO: Replace with actual credits fetch from your backend using user.id
+    // This is a mock implementation
+    const mockCredits = 100
+
+    return {
+      error: false,
+      credits: mockCredits
     }
   })
 

@@ -2,234 +2,154 @@
 
 ## Overview
 
-The authentication system is built using Supabase Auth for user management, with all Supabase interactions happening server-side through TanStack Router's server functions. This ensures sensitive operations and tokens are handled securely on the server.
+The authentication system uses a combination of Supabase Auth (server-side only) and React Context for state management. This provides a secure, performant, and user-friendly authentication experience.
 
-## Integration with TanStack Server Functions
+## Core Components
 
-The authentication system leverages TanStack's server functions to handle all Supabase authentication operations server-side. This ensures sensitive operations like token management never reach the client.
+### 1. AuthContext (`src/auth/AuthContext.tsx`)
 
-### Server Function Structure
+The central piece of our authentication system that provides:
+- User state management
+- Loading states
+- Auto-refresh on tab focus
+- Auto-refresh on network reconnection
+- Centralized logout functionality
 
-Each authentication function follows a consistent pattern:
-1. Input validation using Zod schemas
-2. Server-side Supabase operation
-3. Error handling and user-friendly messages
-4. Type-safe response formatting
-
-For example:
 ```typescript
-export const loginFn = createServerFn({ method: 'POST' })
-  .validator((data: unknown) => {
-    return authInputSchema.parse(data)
-  })
-  .handler(async ({ data }) => {
-    // Server-side Supabase operation
-    const { data: authData, error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-    // Error handling and response formatting
-    // ...
-  })
+const { user, loading, refreshAuth, logout } = useAuth()
 ```
 
-## Components
+### 2. Server Functions (`src/routes/_authed/-server.ts`)
 
-### Server Functions (`src/routes/_authed/-server.ts`)
+All Supabase interactions happen server-side through these functions:
+- `checkAuthFn`: Verifies authentication status
+- `loginFn`: Handles user login
+- `signupFn`: Handles user registration
+- `logoutFn`: Handles user logout
 
-The authentication system provides four main server functions:
+### 3. Protected Routes (`src/routes/_authed/`)
 
-1. `loginFn`: Handles user login
-   - Validates email/password using Zod schema
-   - Performs server-side login via Supabase
-   - Returns user and session data or error messages
-   - Includes user-friendly error message mapping
+Routes under `_authed` are protected by AuthContext:
+- Automatic authentication checks
+- Loading states during checks
+- Redirects for unauthenticated users
+- Preserved redirect paths
 
-2. `signupFn`: Handles user registration
-   - Validates email/password using Zod schema
-   - Creates user account via Supabase
-   - Configures email confirmation redirect
-   - Returns registration status or error messages
+## Authentication Flow
 
-3. `logoutFn`: Handles user logout
-   - Performs server-side logout via Supabase
-   - Returns success/error status
+1. Initial Load:
+   - App starts → AuthContext checks auth state
+   - Shows loading spinner during check
+   - Redirects or renders based on auth state
 
-4. `checkAuthFn`: Verifies authentication status
-   - Checks current user session server-side
-   - Returns user data if authenticated
-   - Used for protecting routes
+2. Route Protection:
+   - Protected routes check auth state
+   - Loading states during checks
+   - Automatic redirects if unauthenticated
 
-### Route Protection
+3. Session Management:
+   - Auth state refreshes on tab focus
+   - Auth state refreshes on network reconnection
+   - Centralized logout handling
 
-Protected routes are organized under the `_authed` layout (`src/routes/_authed.tsx`), which:
+4. Login/Register Flow:
+   - Form submission → Server function call
+   - Server handles Supabase auth
+   - AuthContext updates on success
+   - Redirect to intended destination
 
-1. Checks authentication on every route load using `checkAuthFn`
-2. Redirects unauthenticated users to login with the original destination saved
-3. Provides the authenticated user context to child routes
+## Usage Examples
 
+### Protected Component
 ```typescript
-// Example from _authed.tsx
-beforeLoad: async ({ location }) => {
-  const response = await checkAuthFn()
-  if (!response?.data || response.data.error || !response.data.user) {
-    throw redirect({
-      to: '/login',
-      search: {
-        redirect: location.pathname.replace('/', '/_authed/'),
-      },
-    })
+function ProtectedComponent() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <LoadingSpinner />
   }
-  return { user: response.data.user }
+
+  return <div>Welcome {user?.email}</div>
 }
 ```
 
-### Navigation Components
-
-The app uses two navigation components based on authentication state:
-
-1. `PublicNav`: Shown to unauthenticated users
-   - Displays login/register links
-   - Visible on public routes
-
-2. `ProtectedNav`: Shown to authenticated users
-   - Displays protected route links
-   - Includes logout functionality
-   - Uses server-side logout with proper redirect handling
-
-### Redirect Handling
-
-The system implements a robust redirect mechanism:
-
-1. When accessing protected routes while unauthenticated:
-   - Current path is saved in login page's search params
-   - User is redirected to login page
-
-2. When accessing login/register pages while authenticated:
-   - User is automatically redirected to '/app'
-   - Uses `checkAuthFn` to verify authentication status
-   - Prevents authenticated users from accessing auth pages unnecessarily
-
-3. After successful login:
-   - Checks for redirect URL in search params
-   - Navigates to saved destination or defaults to dashboard
-   - Uses `replace: true` to prevent back-button issues
-
-4. After logout:
-   - Redirects to login page
-   - Clears any saved redirects
-   - Uses `replace: true` to prevent navigation back to protected routes
-
-Example of auth check in login/register routes:
+### Login Form
 ```typescript
-export const Route = createFileRoute('/login')({
-  loader: async () => {
-    const response = await checkAuthFn()
-    if (response?.user && !response.error) {
-      throw redirect({
-        to: '/app',
-      })
+function LoginForm() {
+  const { refreshAuth } = useAuth()
+  
+  const loginMutation = useMutation({
+    fn: loginFn,
+    onSuccess: async () => {
+      await refreshAuth()
+      // Handle redirect
     }
-    return null
-  },
-  component: LoginPage,
-})
-```
-
-## Response Types
-
-The server functions use consistent response types for error handling:
-
-```typescript
-type AuthResponse = {
-  error: boolean
-  message?: string
-  data?: {
-    user: {
-      id: string
-      email: string
-      created_at: string
-    } | null
-    session: {
-      access_token: string
-      expires_at: number
-      refresh_token: string
-    } | null
-  }
-}
-```
-
-## Usage Example
-
-```typescript
-// Login with redirect handling
-const loginMutation = useMutation({
-  fn: loginFn,
-  onSuccess: async ({ data: response }) => {
-    if (!response.error) {
-      await router.invalidate()
-      const { redirect } = router.state.location.search
-      router.navigate({ 
-        to: redirect || '/_authed',
-        replace: true
-      })
-    }
-  }
-})
-
-// Protected route access
-const ProtectedComponent = () => {
-  const { user } = Route.useLoaderData() // User data from _authed layout
-  return <div>Welcome {user.email}</div>
+  })
 }
 ```
 
 ## Security Considerations
 
-1. All Supabase interactions happen server-side
-2. Sensitive data like tokens never reach the client
-3. Protected routes are wrapped in authentication checks
-4. Redirects preserve intended destination securely
-5. Session management handled by Supabase
-6. Input validation using Zod schemas
+1. Server-Side Operations:
+   - All Supabase interactions happen server-side
+   - Tokens never exposed to client
+   - Protected routes properly guarded
 
-## Middleware Integration
+2. State Management:
+   - Auth state cached in memory
+   - Auto-refresh mechanisms
+   - Clean logout handling
 
-The authentication system can be extended using TanStack's middleware system for additional functionality:
+3. Route Protection:
+   - Consistent auth checks
+   - Loading states prevent flashes
+   - Secure redirect handling
 
-### Example: Auth Check Middleware
+## Best Practices
 
-```typescript
-import { createMiddleware } from '@tanstack/react-start'
-import { getServerSupabase } from '~/utils/supabase'
+1. Always use `useAuth` hook for auth state
+2. Handle loading states appropriately
+3. Use server functions for auth operations
+4. Follow existing patterns for consistency
+5. Never bypass the AuthContext system
 
-export const authMiddleware = createMiddleware()
-  .server(async ({ next }) => {
-    const supabase = getServerSupabase()
-    const { data: { user }, error } = await supabase.auth.getUser()
+## Integration with Other Systems
 
-    if (error || !user) {
-      throw new Error('Unauthorized')
-    }
+1. TanStack Query:
+   - Used for data fetching
+   - Integrates with auth state
+   - Handles cache invalidation
 
-    return next({
-      context: { user }
-    })
-  })
-```
+2. TanStack Router:
+   - Type-safe routing
+   - Protected route handling
+   - Clean redirect management
 
-### Using with Protected Routes
+3. Supabase:
+   - Used for auth only
+   - All operations server-side
+   - No direct database access
 
-Apply the middleware to protect specific server functions:
+## Error Handling
 
-```typescript
-export const protectedAction = createServerFn()
-  .middleware([authMiddleware])
-  .handler(async ({ context }) => {
-    // Access authenticated user from context
-    const userId = context.user.id
-    // ... protected operation logic
-  })
-```
+1. Auth Errors:
+   - User-friendly messages
+   - Proper error states
+   - Clean error recovery
 
-For more details on middleware usage, see [Middleware Documentation](./middleware.md).
+2. Network Issues:
+   - Auto-refresh on reconnect
+   - Loading states during checks
+   - Graceful degradation
+
+## Future Considerations
+
+1. Token Refresh:
+   - Auto refresh before expiry
+   - Background refresh
+   - Session synchronization
+
+2. Multi-Tab Support:
+   - State synchronization
+   - Logout coordination
+   - Session management

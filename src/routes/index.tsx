@@ -1,8 +1,6 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { PublicNav } from '~/components/PublicNav'
 import { Footer } from '~/components/Footer'
-import { useCallback } from 'react'
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
@@ -136,10 +134,10 @@ function LandingPage() {
                 </li>
               </ul>
               <Link
-                to="/register"
+                to="/app/billing"
                 className="mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
-                Get started
+                Subscribe Now
               </Link>
             </div>
 
@@ -166,10 +164,10 @@ function LandingPage() {
                 </li>
               </ul>
               <Link
-                to="/register"
+                to="/app/billing"
                 className="mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
-                Get started
+                Subscribe Now
               </Link>
             </div>
 
@@ -196,17 +194,17 @@ function LandingPage() {
                 </li>
               </ul>
               <Link
-                to="/register"
+                to="/app/billing"
                 className="mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
-                Get started
+                Subscribe Now
               </Link>
             </div>
           </div>
         </div>
       </section>
+
       <Footer />
     </div>
-
   )
 }
