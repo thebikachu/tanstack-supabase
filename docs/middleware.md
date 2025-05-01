@@ -1,203 +1,114 @@
-# TanStack Server Function Middleware Guide
+# Server Function Middleware Guide
 
-This guide explains how middleware works in our application, with a focus on authentication and server function protection.
+This guide details the middleware used within this SaaS template, focusing on authentication and global logging. Middleware intercepts server function requests, enabling shared logic like authentication checks or context enrichment.
 
 ## Core Concepts
 
-Middleware intercepts server function requests, allowing you to:
-- Verify authentication
-- Add context data
-- Validate inputs
-- Handle errors consistently
+*   **Interception:** Middleware runs before your server function's main handler.
+*   **Context:** Middleware can read and add data to the `context` object, which is then passed to subsequent middleware or the final handler.
+*   **Control Flow:** Middleware calls `next()` to proceed to the next step (either another middleware or the handler). It can also throw errors or return responses directly to halt execution.
+*   **Type Safety:** Context added by middleware is strongly typed.
 
-### Key Benefits
+## Authentication Middleware (`authMiddleware`)
 
-- **Reusability:** Write auth logic once, apply everywhere
-- **Type Safety:** Full TypeScript support for context
-- **Separation:** Keep business logic clean
-- **Security:** Consistent auth checks
+*   **Location:** `src/middleware/authMiddleware.ts`
+*   **Purpose:** Ensures that a server function is only executed by an authenticated user. It also provides the user's identity and JWT access token to the handler function's context.
+*   **Mechanism:**
+    1.  Uses the `checkAuth` utility (`src/utils/supabase.ts`) which leverages the Supabase server client to verify the user's session using secure cookies.
+    2.  If `checkAuth` fails (no valid session), the middleware throws an "Unauthorized" error, preventing the server function handler from running.
+    3.  If `checkAuth` succeeds, it retrieves the `user` object and the `accessToken` (JWT) from the session.
+    4.  It calls `next({ context: { user, accessToken } })`, making the authenticated user's details and their access token available to the server function handler via the `context` parameter.
 
-## Authentication Middleware
-
-Our auth middleware provides server-side session verification:
-
-```typescript
-// src/middleware/authMiddleware.ts
-import { createMiddleware } from '@tanstack/react-start';
-import { checkAuth } from '../utils/supabase';
-import type { User } from '@supabase/supabase-js';
-
-export interface AuthContext {
-  user: User;
-  accessToken: string;
-}
-
-export const authMiddleware = createMiddleware()
-  .server(async ({ next }) => {
-    const auth = await checkAuth();
-
-    if (!auth.user) {
-      throw new Error('Unauthorized');
+*   **Context Provided:**
+    ```typescript
+    export interface AuthContext {
+      user: User; // Supabase User object
+      accessToken: string; // JWT access token
     }
+    ```
 
-    return next({
-      context: {
-        user: auth.user,
-        accessToken: auth.accessToken
-      } satisfies AuthContext,
-    });
-  });
-```
+*   **Usage:** Applied to server functions requiring authentication using the `.middleware()` chain method.
+    ```typescript
+    // src/routes/_authed/-server.ts
+    import { authMiddleware } from '~/middleware/authMiddleware';
 
-### Using Auth Middleware
+    export const getCredits = createServerFn({ method: 'GET' })
+      .middleware([authMiddleware]) // Apply the middleware
+      .handler(async ({ context }) => { // Context now includes user and accessToken
+        const userId = context.user.id;
+        const token = context.accessToken;
+        // ... fetch credits using userId, potentially using token for backend calls
+        return { credits: 100 };
+      });
 
-Apply to server functions that need protection:
+    export const spendCreditsFn = createServerFn({ method: 'POST' })
+      .middleware([authMiddleware]) // Apply the middleware
+      .validator(...) // Input validation
+      .handler(async ({ data, context }) => {
+        // Use context.accessToken to authorize request to FastAPI backend
+        const response = await fetch('http://localhost:8000/test/spend-credits', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${context.accessToken}` // Pass JWT
+          },
+          body: JSON.stringify(data)
+        });
+        // ... handle response
+      });
+    ```
+
+## Global Logging Middleware (`logMiddleware`)
+
+*   **Location:** `src/utils/loggingMiddleware.tsx`
+*   **Registration:** Applied globally to *all* server functions via `registerGlobalMiddleware` in `src/global-middleware.ts`.
+*   **Purpose:** Provides basic request/response timing information for debugging server function performance.
+*   **Mechanism:**
+    1.  Uses a preliminary `preLogMiddleware` to capture client-side start time (`clientTime`) and send it to the server.
+    2.  On the server, `preLogMiddleware` captures server-side arrival time (`serverTime`) and calculates `durationToServer`. It sends both back to the client.
+    3.  The main `logMiddleware` (client-side) receives the context from the server, calculates total round-trip time, and logs the durations.
+
+*   **Output:** Logs timing details to the browser console for each server function call.
+
+## Input Validation (`validator`)
+
+While not technically middleware in the same chainable sense, the `.validator()` method on `createServerFn` serves a similar purpose for input validation *before* the middleware or handler runs.
+
+*   **Mechanism:** Accepts the raw input data passed to the server function. It should parse/validate this data (commonly using a library like Zod).
+*   **Type Safety:** The *return type* of the validator function becomes the inferred type of the `data` parameter in the handler.
+*   **Error Handling:** If validation fails (e.g., `zod.parse` throws), the server function automatically returns an error response, and the middleware/handler chain is not executed.
 
 ```typescript
-// Example protected server function
-export const getCredits = createServerFn({ method: 'GET' })
-  .middleware([authMiddleware])
-  .handler(async ({context}): Promise<GetCreditsResponse> => {
-    const user = context.user;
-    // Access user data safely
-    return {
-      error: false,
-      credits: await fetchUserCredits(user.id)
-    };
-  });
-```
+// src/routes/_authed/-server.ts
+import { z } from 'zod';
 
-## Input Validation
-
-We use Zod for input validation:
-
-```typescript
 const authInputSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 export const loginFn = createServerFn({ method: 'POST' })
-  .validator((data: unknown) => {
-    return authInputSchema.parse(data)
+  .validator((data: unknown) => { // Receives raw input
+    return authInputSchema.parse(data); // Validate using Zod
   })
-  .handler(async ({ data }) => {
-    // Data is now validated
+  // .middleware(...) // Middleware runs *after* successful validation
+  .handler(async ({ data }) => { // 'data' is now typed as { email: string, password: string }
     const { email, password } = data;
-    // Process login...
+    // ... process validated login data
   });
 ```
 
-## Error Handling
+## Execution Order
 
-Middleware can catch and transform errors:
+For a server function with validation and middleware:
 
-```typescript
-const errorHandlerMiddleware = createMiddleware()
-  .server(async ({ next }) => {
-    try {
-      return await next();
-    } catch (error) {
-      if (error instanceof AuthError) {
-        return {
-          error: true,
-          message: 'Authentication failed'
-        };
-      }
-      throw error; // Let other errors propagate
-    }
-  });
-```
-
-## Context Passing
-
-Share data between middleware and handlers:
-
-```typescript
-interface UserContext {
-  userId: string;
-  permissions: string[];
-}
-
-const userContextMiddleware = createMiddleware()
-  .server(async ({ next, context }) => {
-    const user = context.user; // From auth middleware
-    const permissions = await fetchUserPermissions(user.id);
-    
-    return next({
-      context: {
-        userId: user.id,
-        permissions
-      } satisfies UserContext
-    });
-  });
-```
-
-## Best Practices
-
-1. **Authentication First:**
-   - Always apply authMiddleware before other middleware
-   - Check context.user early in handlers
-
-2. **Type Safety:**
-   ```typescript
-   interface MyContext {
-     user: User;
-     permissions: string[];
-   }
-   
-   const handler = async ({ context }: { context: MyContext }) => {
-     // TypeScript ensures context properties exist
-   };
-   ```
-
-3. **Error Handling:**
-   - Use specific error types
-   - Transform errors into user-friendly responses
-   - Log errors appropriately
-
-4. **Validation:**
-   - Always validate inputs with Zod
-   - Keep validation schemas near related functions
-   - Use descriptive error messages
-
-## Common Patterns
-
-### Protected Route Pattern
-```typescript
-export const protectedAction = createServerFn()
-  .middleware([
-    authMiddleware,
-    userContextMiddleware
-  ])
-  .handler(async ({ context }) => {
-    // Access both auth and user context
-    const { user, permissions } = context;
-    // ... handler logic
-  });
-```
-
-### Validation Pattern
-```typescript
-const inputSchema = z.object({
-  // ... schema definition
-});
-
-export const validatedAction = createServerFn()
-  .validator((data: unknown) => {
-    return inputSchema.parse(data);
-  })
-  .middleware([authMiddleware])
-  .handler(async ({ data, context }) => {
-    // data is typed according to schema
-    // context includes auth data
-  });
-```
-
-## Middleware Order
-
-1. Input Validation
-2. Authentication
-3. Error Handling
-4. Custom Context
-5. Handler Logic
+1.  **Client:** Server function called.
+2.  **Client:** Global `logMiddleware` (client part of `preLogMiddleware`) runs, records `clientTime`.
+3.  **Network:** Request sent to server.
+4.  **Server:** Global `logMiddleware` (server part of `preLogMiddleware`) runs, records `serverTime`, calculates `durationToServer`.
+5.  **Server:** `.validator()` runs. If it throws, an error response is sent back immediately.
+6.  **Server:** `authMiddleware` runs. If it throws (unauthorized), an error response is sent back. Adds `user` and `accessToken` to context.
+7.  **Server:** Server function `.handler()` runs with validated `data` and enriched `context`.
+8.  **Network:** Response sent back to client.
+9.  **Client:** Global `logMiddleware` (main client part) runs, calculates final durations, logs results.
+10. **Client:** Original server function call resolves/rejects.

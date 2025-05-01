@@ -219,3 +219,60 @@ export const checkAuthFn = createServerFn({ method: 'GET' })
       }
     }
   })
+  
+  // Schema for credit spend input
+  const creditSpendSchema = z.object({
+    amount: z.number().min(1, 'Amount must be at least 1'),
+    action: z.string().default('test_action')
+  })
+  
+  type CreditSpendResponse = {
+    error: boolean
+    message?: string
+    data?: {
+      status: string
+      credits_spent: number
+      action: string
+      remaining_balance: number
+      transaction_id: string
+      timestamp: string
+    }
+  }
+  
+  export const spendCreditsFn = createServerFn({ method: 'POST' })
+    .middleware([authMiddleware])
+    .validator((data: unknown) => {
+      return creditSpendSchema.parse(data)
+    })
+    .handler(async ({ data, context }): Promise<CreditSpendResponse> => {
+      try {
+        const apiUrl = `${process.env.VITE_API_BASE_URL}/test/spend-credits`;
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${context.accessToken}`
+          },
+          body: JSON.stringify(data)
+        })
+  
+        if (!response.ok) {
+          const error = await response.json()
+          return {
+            error: true,
+            message: error.detail || 'Failed to spend credits'
+          }
+        }
+  
+        const result = await response.json()
+        return {
+          error: false,
+          data: result
+        }
+      } catch (error) {
+        return {
+          error: true,
+          message: error instanceof Error ? error.message : 'An unknown error occurred'
+        }
+      }
+    })

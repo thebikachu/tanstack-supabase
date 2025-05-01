@@ -1,213 +1,62 @@
-# TanStack Core Concepts
+# Architecture Overview & Core Concepts
 
-This guide covers the core concepts of our TanStack-based architecture, focusing on routing, data loading, layouts, and authentication.
+This document provides a high-level overview of the core architectural concepts used in this TanStack Start SaaS template. For in-depth details, please refer to the specific documentation files linked below.
 
-## 1. Project Structure
+## Key Technologies
+
+*   **Framework:** React with Vite
+*   **Routing:** TanStack Router (File-based, Type-safe)
+*   **Server Functions:** TanStack Start (`createServerFn`) for RPC-like calls.
+*   **Data Fetching/State:** TanStack Query (`useQuery`, `useSuspenseQuery`, `useMutation`)
+*   **Authentication:** Supabase Auth (Server-Side only) + React Context (`AuthContext`)
+*   **Styling:** Tailwind CSS + shadcn/ui components
+*   **Backend (Example):** FastAPI (Python) - Assumed for features like credit spending.
+
+## Core Architectural Patterns
+
+1.  **File-Based Routing:** TanStack Router uses the `src/routes` directory structure to define application routes. Special file/folder naming conventions (`__root.tsx`, `_layout.tsx`, `$param.tsx`, `index.tsx`) control layout nesting and path parameters.
+
+2.  **Server-Centric Operations:** Sensitive logic, especially authentication and direct database/external API interactions, is handled exclusively within **Server Functions** (`-server.ts` files or functions marked with `'use server'`). This keeps credentials and sensitive operations off the client.
+    *   See: [Project Server Functions](./server-functions.md)
+
+3.  **Middleware:** Server functions can be enhanced or protected using middleware. This template uses middleware for:
+    *   **Authentication (`authMiddleware`):** Verifies user sessions before allowing protected server functions to execute and injects user context.
+    *   **Logging (`logMiddleware`):** Globally applied to provide basic timing information for debugging.
+    *   See: [Server Function Middleware Guide](./middleware.md)
+
+4.  **Authentication (`AuthContext`)**: A React Context (`src/auth/AuthContext.tsx`) manages the client-side authentication state (user object, loading status). It interacts with server functions (`checkAuthFn`, `loginFn`, `logoutFn`) and handles session refresh logic. Protected routes use this context to gate access.
+    *   See: [Authentication System Documentation](./auth-system.md)
+
+5.  **Data Fetching Strategies:** The template utilizes different TanStack Query/Router patterns for data loading based on requirements:
+    *   **Route Loaders (`loader`):** Fetch critical data *before* route rendering (good for SEO).
+    *   **Suspense (`useSuspenseQuery`):** Fetch data *after* initial render, showing fallbacks (good for UX on non-critical data).
+    *   **Standard Query (`useQuery`):** Client-side fetching with manual loading/error state handling.
+    *   See: [Data Fetching Strategies](./tanstack-data-fetching.md)
+
+6.  **Layouts:** Nested layouts are defined using `_layout.tsx` files or the root layout `__root.tsx`. The `_authed.tsx` layout specifically handles the authentication check for protected sections.
+
+7.  **UI Components:** Leverages `shadcn/ui` for pre-built, accessible, and customizable components based on Radix UI and Tailwind CSS.
+
+## Project Structure Highlights
 
 ```
 src/
-├── auth/                 # Authentication system
-│   └── AuthContext.tsx   # Central auth management
-├── routes/
-│   ├── _authed/         # Protected routes container
-│   │   ├── -server.ts   # Auth server functions
-│   │   └── app/         # Protected application routes
-│   ├── __root.tsx       # Root layout with AuthProvider
-│   ├── _authed.tsx      # Auth layout with protection
-│   └── index.tsx        # Public home
-├── components/
-│   ├── ui/             # Shared UI components
-│   └── [feature]/      # Feature-specific components
-└── hooks/              # Custom hooks
+├── auth/                 # Authentication Context (`AuthContext.tsx`)
+├── components/           # Reusable UI components (incl. shadcn/ui)
+├── hooks/                # Custom React hooks (e.g., `useMutation`, `useToast`)
+├── lib/                  # Utility functions (e.g., `cn` for Tailwind)
+├── middleware/           # Server function middleware (`authMiddleware.ts`)
+├── routes/               # Application routes (File-based routing)
+│   ├── __root.tsx       # Root layout (QueryClient, AuthProvider)
+│   ├── _authed/         # Directory for all authenticated routes
+│   │   ├── -server.ts   # Server functions requiring auth (or related)
+│   │   └── app/         # Main application sections (dashboard, settings, etc.)
+│   ├── _authed.tsx      # Layout component for authenticated routes (auth check)
+│   ├── index.tsx        # Public landing page
+│   ├── login.tsx        # Login page
+│   └── register.tsx     # Registration page
+├── styles/               # Global CSS (`app.css`)
+└── utils/                # Shared utilities (e.g., Supabase client setup, logging)
 ```
 
-## 2. Authentication System
-
-Our authentication system uses a combination of:
-- React Context for state management (AuthContext)
-- Server-side Supabase operations
-- TanStack Router for protection
-
-### AuthContext Usage
-
-```typescript
-function ProtectedComponent() {
-  const { user, loading, logout } = useAuth()
-
-  if (loading) {
-    return <LoadingSpinner />
-  }
-
-  return (
-    <div>
-      Welcome {user?.email}
-      <button onClick={logout}>Logout</button>
-    </div>
-  )
-}
-```
-
-### Protected Routes
-
-All routes under `_authed/` are automatically protected:
-
-```typescript
-// src/routes/_authed.tsx
-export const Route = createFileRoute('/_authed')({
-  component: AuthedLayout,
-})
-
-function AuthedLayout() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.navigate({
-        to: '/login',
-        search: {
-          redirect: router.state.location.pathname,
-        },
-        replace: true
-      })
-    }
-  }, [user, loading, router])
-
-  if (loading) {
-    return <LoadingSpinner />
-  }
-
-  if (!user) {
-    return null
-  }
-
-  return <Outlet />
-}
-```
-
-## 3. Server Functions
-
-Server functions handle all sensitive operations:
-
-```typescript
-// src/routes/_authed/-server.ts
-export const loginFn = createServerFn({ method: 'POST' })
-  .validator((data: unknown) => {
-    return authInputSchema.parse(data)
-  })
-  .handler(async ({ data }) => {
-    const supabase = getServerSupabase()
-    const { data: authData, error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-    // Handle response...
-  })
-```
-
-## 4. Data Loading
-
-Use TanStack Query for data fetching:
-
-```typescript
-function UserProfile() {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['user-profile'],
-    queryFn: () => getUserProfile(),
-  })
-
-  if (isLoading) return <LoadingSpinner />
-
-  return <div>{user.name}</div>
-}
-```
-
-## 5. Layouts
-
-### Root Layout with Auth
-
-```typescript
-// src/routes/__root.tsx
-export const Route = createRootRoute({
-  component: RootComponent,
-})
-
-function RootComponent() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Outlet />
-      </AuthProvider>
-    </QueryClientProvider>
-  )
-}
-```
-
-### Feature Layouts
-
-```typescript
-// src/routes/_authed/app/route.tsx
-export const Route = createFileRoute('/app')({
-  component: AppLayout,
-})
-
-function AppLayout() {
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main>
-        <Outlet />
-      </main>
-    </div>
-  )
-}
-```
-
-## 6. Navigation
-
-Use type-safe routing with Link component:
-
-```typescript
-import { Link } from '@tanstack/react-router'
-
-function Navigation() {
-  return (
-    <nav>
-      <Link to="/app/dashboard">Dashboard</Link>
-      <Link to="/app/settings">Settings</Link>
-    </nav>
-  )
-}
-```
-
-## 7. Error Handling
-
-Consistent error handling through toast notifications:
-
-```typescript
-const { toast } = useToast()
-
-const mutation = useMutation({
-  mutationFn: updateProfile,
-  onError: (error) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-    })
-  }
-})
-```
-
-## Best Practices
-
-1. Always use `useAuth` for authentication state
-2. Handle loading states appropriately
-3. Keep sensitive operations server-side
-4. Use type-safe routing
-5. Follow the established folder structure
-6. Document new patterns and features
-
-For more detailed documentation on specific topics, see:
-- [Auth System Documentation](./auth-system.md)
-- [Middleware Documentation](./middleware.md)
+This structure promotes separation of concerns, type safety, and leverages the capabilities of the TanStack ecosystem for building robust web applications.

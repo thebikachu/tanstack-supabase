@@ -33,6 +33,7 @@ import { Route as AuthedAppAlertsImport } from './routes/_authed/app/alerts'
 import { Route as AuthedAppSettingsRouteImport } from './routes/_authed/app/settings/route'
 import { Route as AuthedAppDashboardRouteImport } from './routes/_authed/app/dashboard/route'
 import { Route as AuthedAppBillingRouteImport } from './routes/_authed/app/billing/route'
+import { Route as AuthedAppTestIndexImport } from './routes/_authed/app/test/index'
 import { Route as AuthedAppSettingsIndexImport } from './routes/_authed/app/settings/index'
 import { Route as AuthedAppDashboardIndexImport } from './routes/_authed/app/dashboard/index'
 import { Route as AuthedAppBillingIndexImport } from './routes/_authed/app/billing/index'
@@ -172,6 +173,12 @@ const AuthedAppDashboardRouteRoute = AuthedAppDashboardRouteImport.update({
 const AuthedAppBillingRouteRoute = AuthedAppBillingRouteImport.update({
   id: '/app/billing',
   path: '/app/billing',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedAppTestIndexRoute = AuthedAppTestIndexImport.update({
+  id: '/app/test/',
+  path: '/app/test/',
   getParentRoute: () => AuthedRoute,
 } as any)
 
@@ -412,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAppSettingsIndexImport
       parentRoute: typeof AuthedAppSettingsRouteImport
     }
+    '/_authed/app/test/': {
+      id: '/_authed/app/test/'
+      path: '/app/test'
+      fullPath: '/app/test'
+      preLoaderRoute: typeof AuthedAppTestIndexImport
+      parentRoute: typeof AuthedImport
+    }
   }
 }
 
@@ -498,6 +512,7 @@ interface AuthedRouteChildren {
   AuthedAppSettingsRouteRoute: typeof AuthedAppSettingsRouteRouteWithChildren
   AuthedAppAlertsRoute: typeof AuthedAppAlertsRoute
   AuthedAppIndexRoute: typeof AuthedAppIndexRoute
+  AuthedAppTestIndexRoute: typeof AuthedAppTestIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
@@ -506,6 +521,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAppSettingsRouteRoute: AuthedAppSettingsRouteRouteWithChildren,
   AuthedAppAlertsRoute: AuthedAppAlertsRoute,
   AuthedAppIndexRoute: AuthedAppIndexRoute,
+  AuthedAppTestIndexRoute: AuthedAppTestIndexRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -568,6 +584,7 @@ export interface FileRoutesByFullPath {
   '/app/billing/': typeof AuthedAppBillingIndexRoute
   '/app/dashboard/': typeof AuthedAppDashboardIndexRoute
   '/app/settings/': typeof AuthedAppSettingsIndexRoute
+  '/app/test': typeof AuthedAppTestIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -592,6 +609,7 @@ export interface FileRoutesByTo {
   '/app/billing': typeof AuthedAppBillingIndexRoute
   '/app/dashboard': typeof AuthedAppDashboardIndexRoute
   '/app/settings': typeof AuthedAppSettingsIndexRoute
+  '/app/test': typeof AuthedAppTestIndexRoute
 }
 
 export interface FileRoutesById {
@@ -624,6 +642,7 @@ export interface FileRoutesById {
   '/_authed/app/billing/': typeof AuthedAppBillingIndexRoute
   '/_authed/app/dashboard/': typeof AuthedAppDashboardIndexRoute
   '/_authed/app/settings/': typeof AuthedAppSettingsIndexRoute
+  '/_authed/app/test/': typeof AuthedAppTestIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -655,6 +674,7 @@ export interface FileRouteTypes {
     | '/app/billing/'
     | '/app/dashboard/'
     | '/app/settings/'
+    | '/app/test'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -678,6 +698,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/dashboard'
     | '/app/settings'
+    | '/app/test'
   id:
     | '__root__'
     | '/'
@@ -708,6 +729,7 @@ export interface FileRouteTypes {
     | '/_authed/app/billing/'
     | '/_authed/app/dashboard/'
     | '/_authed/app/settings/'
+    | '/_authed/app/test/'
   fileRoutesById: FileRoutesById
 }
 
@@ -783,7 +805,8 @@ export const routeTree = rootRoute
         "/_authed/app/dashboard",
         "/_authed/app/settings",
         "/_authed/app/alerts",
-        "/_authed/app/"
+        "/_authed/app/",
+        "/_authed/app/test/"
       ]
     },
     "/_pathlessLayout": {
@@ -894,6 +917,10 @@ export const routeTree = rootRoute
     "/_authed/app/settings/": {
       "filePath": "_authed/app/settings/index.tsx",
       "parent": "/_authed/app/settings"
+    },
+    "/_authed/app/test/": {
+      "filePath": "_authed/app/test/index.tsx",
+      "parent": "/_authed"
     }
   }
 }
